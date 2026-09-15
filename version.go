@@ -8,6 +8,9 @@ import (
 )
 
 var (
+	// Invalid is the canonical invalid SemVer value.
+	Invalid SemVer
+
 	ErrEmptyVersion     = errors.New("empty version")
 	ErrInvalidVersion   = errors.New("invalid version")
 	ErrInvalidSuffix    = errors.New("invalid version suffix")
@@ -23,6 +26,7 @@ func NewEmptySemVer() SemVer {
 
 		HasMinor: true,
 		HasPatch: true,
+		Valid:    true,
 	}
 }
 
@@ -79,6 +83,8 @@ func ParseSemVer(input string, allowSuffix bool) (SemVer, error) {
 		}
 
 		if index == len(input) {
+			version.Valid = true
+
 			return version, nil
 		}
 
@@ -106,6 +112,7 @@ func ParseSemVer(input string, allowSuffix bool) (SemVer, error) {
 			}
 
 			version.Suffix = suffix
+			version.Valid = true
 
 			return version, nil
 		default:

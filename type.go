@@ -9,9 +9,20 @@ type SemVer struct {
 
 	HasMinor bool
 	HasPatch bool
+	Valid    bool
 
 	Prefix byte
 	Suffix string
+}
+
+// IsValid reports whether s was produced by a successful parse or constructor.
+func (s SemVer) IsValid() bool {
+	return s.Valid
+}
+
+// IsInvalid reports whether s does not represent a successfully parsed or constructed version.
+func (s SemVer) IsInvalid() bool {
+	return !s.Valid
 }
 
 // HigherThan reports whether s has higher precedence than b.
@@ -19,9 +30,9 @@ func (s SemVer) HigherThan(b SemVer) bool {
 	return s.Compare(b) > 0
 }
 
-// Equal compares parsed identity, ignoring the optional v prefix.
+// Equal compares validity and parsed identity, ignoring the optional v prefix.
 func (s SemVer) Equal(b SemVer) bool {
-	if s.Major != b.Major || s.Suffix != b.Suffix {
+	if s.Valid != b.Valid || s.Major != b.Major || s.Suffix != b.Suffix {
 		return false
 	}
 

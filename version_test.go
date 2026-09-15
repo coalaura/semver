@@ -455,6 +455,10 @@ func TestParseSemVer(t *testing.T) {
 					t.Fatalf("expected error %v, got %v", test.expectedError, err)
 				}
 
+				if version.IsValid() || !version.IsInvalid() {
+					t.Fatalf("expected invalid version, got %+v", version)
+				}
+
 				return
 			}
 
@@ -462,10 +466,50 @@ func TestParseSemVer(t *testing.T) {
 				t.Fatalf("expected no error, got %v", err)
 			}
 
+			if !version.IsValid() || version.IsInvalid() {
+				t.Fatalf("expected valid version, got %+v", version)
+			}
+
+			test.expected.Valid = true
+
 			if version != test.expected {
 				t.Fatalf("expected %+v, got %+v", test.expected, version)
 			}
 		})
+	}
+}
+
+func TestSemVerValidityDistinguishesZeroFromInvalid(t *testing.T) {
+	t.Parallel()
+
+	if Invalid != (SemVer{}) {
+		t.Fatalf("expected Invalid to be the zero SemVer value, got %+v", Invalid)
+	}
+
+	if Invalid.IsValid() || !Invalid.IsInvalid() {
+		t.Fatal("expected Invalid to report invalid")
+	}
+
+	zero, err := ParseSemVer("0", false)
+	if err != nil {
+		t.Fatalf("parse zero version: %v", err)
+	}
+
+	invalid, err := ParseSemVer("invalid", false)
+	if !errors.Is(err, ErrInvalidVersion) {
+		t.Fatalf("expected error %v, got %v", ErrInvalidVersion, err)
+	}
+
+	if !zero.IsValid() || zero.IsInvalid() {
+		t.Fatal("expected zero version to be valid")
+	}
+
+	if invalid.IsValid() || !invalid.IsInvalid() {
+		t.Fatal("expected failed parse result to be invalid")
+	}
+
+	if zero.Equal(invalid) {
+		t.Fatal("expected valid zero version and invalid version not to be equal")
 	}
 }
 

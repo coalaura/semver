@@ -30,8 +30,11 @@ fmt.Println(version.Major)      // 1
 fmt.Println(version.Minor)      // 2
 fmt.Println(version.Patch)      // 3
 fmt.Println(version.Suffix)     // -rc.1
+fmt.Println(version.IsValid())  // true
 fmt.Println(version.String())   // v1.2.3-rc.1
 ```
+
+`Valid`, `IsValid` and `IsInvalid` distinguish a successfully parsed zero version from an invalid result. `Invalid` is the canonical invalid value and can be used instead of `SemVer{}`. `ParseSemVer` and `NewEmptySemVer` return valid values on success. Set `Valid: true` when constructing a valid `SemVer` with a struct literal.
 
 Set `allowSuffix` to `false` to reject prerelease and build metadata:
 
@@ -58,7 +61,7 @@ stable.Compare(candidate)    // 1
 - Prerelease versions have lower precedence than releases.
 - Build metadata and the `v` prefix do not affect precedence.
 
-`Equal` compares the parsed components, component presence and complete suffix. It ignores the optional `v` prefix.
+`Equal` compares validity, parsed components, component presence and the complete suffix. It ignores the optional `v` prefix.
 
 ## Performance
 
